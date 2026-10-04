@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -33,6 +34,8 @@ build/
 ### VS Code ###
 .vscode/
 =======
+=======
+>>>>>>> main
 ### AL ###
 #Template for AL projects for Dynamics 365 Business Central
 #launch.json folder
@@ -55,5 +58,9 @@ rad.json
 *.bclicense
 *.flf
 #Test results file
+<<<<<<< HEAD
+TestResults.xml
+>>>>>>> main
+=======
 TestResults.xml
 >>>>>>> main
