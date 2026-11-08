@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.UserRequestDTO;
@@ -28,10 +29,14 @@ public class UserService implements IReadService<UserResponseDTO>, IWriteService
 
 	private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 	
-	public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+	public UserService(UserRepository userRepository, 
+			RoleRepository roleRepository,
+			PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Transactional
@@ -59,7 +64,7 @@ public class UserService implements IReadService<UserResponseDTO>, IWriteService
         user.setEmail(obj.getEmail());
         
         // 2. Password (se hai PasswordEncoder fai: passwordEncoder.encode(requestDTO.getPassword()))
-        user.setPassword(obj.getPassword());
+        user.setPassword(passwordEncoder.encode(obj.getPassword()));
         
         // 3. Genera UUID univoco lato Java
         user.setUuid(UUID.randomUUID().toString());
@@ -149,7 +154,7 @@ public class UserService implements IReadService<UserResponseDTO>, IWriteService
         }
         if (requestDTO.getPassword() != null && !requestDTO.getPassword().isBlank()) {
             // Se usi PasswordEncoder: existingUser.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
-            existingUser.setPassword(requestDTO.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
         }
 
         // 3. Aggiorna i ruoli se specificati nel payload
