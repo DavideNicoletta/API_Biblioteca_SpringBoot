@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.BookRequestDTO;
 import com.example.demo.dto.BookResponseDTO;
-import com.example.demo.dto.UserResponseDTO;
+
+import com.example.demo.exceptions.ConflictException;
+import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.mapper.BookMapper;
 import com.example.demo.models.Book;
-import com.example.demo.models.User;
+
 import com.example.demo.repositories.BookRepository;
 
 import jakarta.transaction.Transactional;
@@ -45,16 +47,6 @@ public class BookService implements IReadService<BookResponseDTO>, IWriteService
 		return false;
 	}
 
-	@Transactional
-	public boolean deleteByIsbn(String isbn) {
-		Optional<Book> book = bookRepository.findByIsbn(isbn);
-		if(book.isPresent()) {
-			bookRepository.delete(book.get());
-			return true;
-		}
-		return false;
-	}
-
 	@Override
 	public List<BookResponseDTO> findAll() {
 		return bookRepository.findAll().stream().map(BookMapper::toDTO).toList();
@@ -76,7 +68,11 @@ public class BookService implements IReadService<BookResponseDTO>, IWriteService
 	
 	@Transactional
 	public BookResponseDTO Insert(BookRequestDTO obj) {
-		// 1. Istanzia la nuova Entity Book
+		
+		if (bookRepository.findByIsbn(obj.getIsbn()).isPresent()) {
+		    throw new ConflictException("Esiste già un libro con ISBN " + obj.getIsbn());
+		}
+		
 		Book book = new Book();
 		book.setTitle(obj.getTitle());
 		book.setAuthor(obj.getAuthor());
@@ -84,28 +80,34 @@ public class BookService implements IReadService<BookResponseDTO>, IWriteService
 		book.setPrice(obj.getPrice());
 		book.setAvailable_copies(obj.getAvailableCopies() != null ? obj.getAvailableCopies() : 1);
 
-		// 2. Genera UUID univoco lato Java e data di creazione
+		
 		book.setUuid(UUID.randomUUID().toString());
 		book.setCreatedAt(new Date());
 
-		// 3. Esegue la INSERT sul database tramite save()
+		
 		Book savedBook = bookRepository.save(book);
 
-		// 4. Converte il libro appena salvato in BookResponseDTO e lo restituisce
+
 		return BookMapper.toDTO(savedBook);
 	}
 	
 	@Transactional
 	public BookResponseDTO updateBook(String uuid, BookRequestDTO requestDTO) {
-		// 1. Cerca il libro esistente tramite UUID
+
 		Optional<Book> bookOptional = bookRepository.findByUuid(uuid);
 		if (bookOptional.isEmpty()) {
-			return null; // Libro non trovato
+			throw new NotFoundException("Libro non trovato");
 		}
 
+		if (requestDTO.getIsbn() != null
+		        && bookRepository.findByIsbn(requestDTO.getIsbn())
+		            .filter(b -> !b.getUuid().equals(uuid))
+		            .isPresent()) {
+		    throw new ConflictException("ISBN già usato da un altro libro");
+		}
+		
 		Book existingBook = bookOptional.get();
 
-		// 2. Aggiorna i campi consentiti
 		if (requestDTO.getTitle() != null && !requestDTO.getTitle().isBlank()) {
 			existingBook.setTitle(requestDTO.getTitle());
 		}
@@ -122,10 +124,8 @@ public class BookService implements IReadService<BookResponseDTO>, IWriteService
 			existingBook.setAvailable_copies(requestDTO.getAvailableCopies());
 		}
 
-		// 3. Salva le modifiche (esegue UPDATE sul database)
 		Book savedBook = bookRepository.save(existingBook);
 
-		// 4. Converte in ResponseDTO
 		return BookMapper.toDTO(savedBook);
 	}
 }

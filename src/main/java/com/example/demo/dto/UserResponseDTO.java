@@ -1,52 +1,29 @@
 package com.example.demo.dto;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
-import com.example.demo.models.Role;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
 public class UserResponseDTO {
 
-
-	private String 	uuid;
-	private String 	user;
-	private String 	emai;
-	private Boolean enab;
-	private Date 	crea;
-	private Set<String> ruol;
+	private String uuid;
+	private String username;
+	private String email;
+	private Boolean enabled;
+	private Date createdAt;
+	private Set<String> roles;
 
 	public UserResponseDTO() {
-		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public UserResponseDTO(String uuid, String username, String email, Boolean enabled, Date createdAt, Set<String> roles) {
-        this.uuid = uuid;
-        this.user = username;
-        this.emai = email;
-        this.enab = enabled;
-        this.crea = createdAt;
-        this.ruol = roles;
-    }
-	
-	
-	public Set<String> getRuol() {
-		return ruol;
+	public UserResponseDTO(String uuid, String username, String email,
+			Boolean enabled, Date createdAt, Set<String> roles) {
+		this.uuid = uuid;
+		this.username = username;
+		this.email = email;
+		this.enabled = enabled;
+		this.createdAt = createdAt;
+		this.roles = roles;
 	}
-
-
-
-	public void setRuol(Set<String> ruol) {
-		this.ruol = ruol;
-	}
-
-
 
 	public String getUuid() {
 		return uuid;
@@ -56,38 +33,43 @@ public class UserResponseDTO {
 		this.uuid = uuid;
 	}
 
-	public String getUser() {
-		return user;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public String getEmai() {
-		return emai;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setEmai(String emai) {
-		this.emai = emai;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public Boolean getEnab() {
-		return enab;
+	public Boolean getEnabled() {
+		return enabled;
 	}
 
-	public void setEnab(Boolean enab) {
-		this.enab = enab;
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
-	public Date getCrea() {
-		return crea;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCrea(Date crea) {
-		this.crea = crea;
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
-	
-	
-	
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<String> roles) {
+		this.roles = roles;
+	}
 }

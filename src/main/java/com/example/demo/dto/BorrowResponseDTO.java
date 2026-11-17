@@ -7,7 +7,6 @@ public class BorrowResponseDTO {
     private String uuid;
     private String userUuid;
     private String username;
-    private String userEmail;
     private String bookUuid;
     private String bookTitle;
     private String bookIsbn;
@@ -18,13 +17,11 @@ public class BorrowResponseDTO {
     public BorrowResponseDTO() {
     }
 
-    public BorrowResponseDTO(String uuid, String userUuid, String username, String userEmail,
-                             String bookUuid, String bookTitle, String bookIsbn,
-                             LocalDate borrowDate, LocalDate returnDate, String status) {
+    public BorrowResponseDTO(String uuid, String userUuid, String username, String bookUuid, String bookTitle, 
+    						String bookIsbn, LocalDate borrowDate, LocalDate returnDate, String status) {
         this.uuid = uuid;
         this.userUuid = userUuid;
         this.username = username;
-        this.userEmail = userEmail;
         this.bookUuid = bookUuid;
         this.bookTitle = bookTitle;
         this.bookIsbn = bookIsbn;
@@ -57,14 +54,6 @@ public class BorrowResponseDTO {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
     }
 
     public String getBookUuid() {

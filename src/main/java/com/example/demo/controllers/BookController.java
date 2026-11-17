@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.BookRequestDTO;
 import com.example.demo.dto.BookResponseDTO;
+import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.models.Book;
 import com.example.demo.response.ResponseAPI;
 import com.example.demo.services.BookService;
@@ -32,83 +33,51 @@ public class BookController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<ResponseAPI<List<BookResponseDTO>>> findAll(){
-		List<BookResponseDTO> data = bookService.findAll();
-		if(data != null) {
-			return ResponseEntity.ok(ResponseAPI.success(data));
-		}
-		return ResponseEntity.noContent().build();
+	public ResponseEntity<ResponseAPI<List<BookResponseDTO>>> findAll() {
+	    return ResponseEntity.ok(ResponseAPI.success(bookService.findAll()));
 	}
 	
 	@GetMapping("/uuid/{uuid}")
-	public ResponseEntity<ResponseAPI<Optional<BookResponseDTO>>> findByUuid(@PathVariable String uuid) {
-		Optional<BookResponseDTO> data = bookService.findByUuid(uuid);
-		if(! data.isEmpty()) {
-			return ResponseEntity.ok(ResponseAPI.success(data));
-		}
-		return ResponseEntity.noContent().build();
-
+	public ResponseEntity<ResponseAPI<BookResponseDTO>> findByUuid(@PathVariable String uuid) {
+	    BookResponseDTO data = bookService.findByUuid(uuid)
+	            .orElseThrow(() -> new NotFoundException("Libro non trovato"));
+	    return ResponseEntity.ok(ResponseAPI.success(data));
 	}
+
 	
 	@GetMapping("/title/{title}")
-	public ResponseEntity<ResponseAPI<Optional<BookResponseDTO>>> findByTitle(@PathVariable String title){
-		Optional<BookResponseDTO> data = bookService.findByTitle(title);
-		if(!data.isEmpty()) {
-			return ResponseEntity.ok(ResponseAPI.success(data));
-		}
-		return ResponseEntity.noContent().build();
+	public ResponseEntity<ResponseAPI<BookResponseDTO>> findByTitle(@PathVariable String title){
+		BookResponseDTO data = bookService.findByTitle(title)
+				.orElseThrow(() -> new NotFoundException("Libro non trovato"));
+		return ResponseEntity.ok(ResponseAPI.success(data));
 	}
 	
 	@GetMapping("/isbn/{isbn}")
-	public ResponseEntity<ResponseAPI<Optional<BookResponseDTO>>> findByIsbn(@PathVariable String isbn){
-		Optional<BookResponseDTO> data = bookService.findByIsbn(isbn);
-		if(!data.isEmpty()) {
-			return ResponseEntity.ok(ResponseAPI.success(data));
-		}
-		return ResponseEntity.noContent().build();
+	public ResponseEntity<ResponseAPI<BookResponseDTO>> findByIsbn(@PathVariable String isbn){
+		BookResponseDTO data = bookService.findByIsbn(isbn)
+				.orElseThrow(() -> new NotFoundException("Libro non trovato"));
+		return ResponseEntity.ok(ResponseAPI.success(data));
 	}
 	
 	@PostMapping
-	public ResponseEntity addBook(@RequestBody BookRequestDTO dto) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(bookService.Insert(dto));
+	public ResponseEntity<ResponseAPI<BookResponseDTO>> addBook(@RequestBody BookRequestDTO dto) {
+	    return ResponseEntity.status(HttpStatus.CREATED)
+	            .body(ResponseAPI.success(bookService.Insert(dto)));
 	}
 	
-	@DeleteMapping("/uuid/delete/{uuid}")
-	public ResponseEntity deleteBookByUuid(@PathVariable String uuid) {
-		boolean deleted = bookService.Delete(uuid);
-		if(deleted) {
-			return ResponseEntity.ok(ResponseAPI.success("Libro eliminato con successo"));
-		}
-		
-		return ResponseEntity
-				.status(HttpStatus.NO_CONTENT)
-				.body(new ResponseAPI<>("NOT_FOUND", "Libro non trovato"));
+	@DeleteMapping("/{uuid}")
+	public ResponseEntity<Void> deleteBookByUuid(@PathVariable String uuid) {
+	    if (!bookService.Delete(uuid)) {
+	        throw new NotFoundException("Libro non trovato");
+	    }
+	    return ResponseEntity.noContent().build();
 	}
 	
-	@DeleteMapping("/isbn/delete/{isbn}")
-	public ResponseEntity deleteBookByIsbn(@PathVariable String isbn) {
-		boolean deleted = bookService.deleteByIsbn(isbn);
-		if(deleted) {
-			return ResponseEntity.ok(ResponseAPI.success("Libro eliminato con successo"));
-		}
-		
-		return ResponseEntity
-				.status(HttpStatus.NO_CONTENT)
-				.body(new ResponseAPI<>("NOT_FOUND", "Libro non trovato"));
-	}
 	
-	@PutMapping("update/{uuid}")
+	@PutMapping("/{uuid}")
 	public ResponseEntity<ResponseAPI<BookResponseDTO>> updateBook(
-			@PathVariable String uuid,
-			@RequestBody BookRequestDTO request) {
-		BookResponseDTO dto = bookService.updateBook(uuid, request);
-		if(dto != null) {
-			return ResponseEntity.ok(ResponseAPI.success(dto));
-		}
-		
-		return ResponseEntity
-				.status(HttpStatus.NO_CONTENT)
-				.body(new ResponseAPI<>("NOT_FOUND", null));
+	        @PathVariable String uuid, @RequestBody BookRequestDTO request) {
+	    return ResponseEntity.ok(ResponseAPI.success(bookService.updateBook(uuid, request)));
 	}
 	
 	

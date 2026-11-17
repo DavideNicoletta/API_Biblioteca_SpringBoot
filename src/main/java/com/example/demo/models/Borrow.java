@@ -34,7 +34,7 @@ public class Borrow {
 
 
     @Column(nullable = false, length = 20)
-    private String status = "ACTIVE";
+    private String status = "Active";
 
 
     public Borrow() {
